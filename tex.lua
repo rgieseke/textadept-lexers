@@ -38,7 +38,7 @@ local environment = token('environment',  env_latex + env_latex_math +
 
 -- commands
 local escapes = S('$%_{}&#')
-local command = token('keyword', '\\' * (l.word + escapes))
+local command = token('keyword', '\\' * (l.alpha^1 + escapes))
 
 -- operators
 local operator = token('operator', S('$&%#{}[]'))
