@@ -9,21 +9,21 @@ local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
 
 module(...)
 
-local ws = token('whitespace', l.space^1)
+local ws = token(l.WHITESPACE, l.space^1)
 
 -- comments (4.1)
 local line_comment = (';' * l.nonnewline^0) + ('#' * l.nonnewline^0)
 local block_comment = '/*' * (l.any - '*/')^0 * '*/'
-local comment = token('comment', line_comment + block_comment)
+local comment = token(l.COMMENT, line_comment + block_comment)
 
 -- numbers
-local number = token('number', l.integer)
+local number = token(l.NUMBER, l.integer)
 
 -- strings
 local sq_str = l.delimited_range("'", '$\\')
 local dq_str = l.delimited_range('"', '$\\')
 local ex_str = l.delimited_range('`', '$\\')
-local string = token('string', sq_str + dq_str + ex_str)
+local string = token(l.STRING, sq_str + dq_str + ex_str)
 
 -- variables (4.2)
 local vars = word_match({
@@ -32,10 +32,10 @@ local vars = word_match({
   '$INSTDIR', '$OUTDIR', '$CMDLINE', '$LANGUAGE',
   'Var', '/GLOBAL'
 }, '$/')
-local variable = token('variable', vars + ('$' * l.word))
+local variable = token(l.VARIABLE, vars + ('$' * l.word))
 
 -- constants (4.2.3)
-local constant = token('constant', word_match({
+local constant = token(l.CONSTANT, word_match({
   '$PROGRAMFILES', '$PROGRAMFILES32', '$PROGRAMFILES64',
   '$COMMONFILES', '$COMMONFILES32', '$COMMONFILES64',
   '$DESKTOP', '$EXEDIR', '$EXEFILE', '$EXEPATH', '${NSISDIR}', '$WINDIR',
@@ -52,7 +52,7 @@ local constant = token('constant', word_match({
 local label = token('label', l.word * ':')
 
 -- keywords
-local keyword = token('keyword', word_match({
+local keyword = token(l.KEYWORD, word_match({
 -- Pages (4.5)
   'Page', 'UninstPage', 'PageEx', 'PageEnd', 'PageExEnd',
 -- Section commands (4.6)
@@ -100,9 +100,9 @@ local keyword = token('keyword', word_match({
   'FlushINI', 'ReadEnvStr', 'ReadINIStr', 'ReadRegDWORD', 'ReadRegStr',
   'WriteINIStr', 'WriteRegBin', 'WriteRegDWORD', 'WriteRegStr',
   'WriteRegExpandStr', 'HKCR', 'HKEY_CLASSES_ROOT', 'HKLM', 'HKEY_LOCAL_MACHINE',
-  'HKCU', 'HKEY_CURRENT_USER', 'HKU', 'HKEY_USERS', 'HKCC', 'HKEY_CURRENT_CONFIG',
-  'HKDD', 'HKEY_DYN_DATA', 'HKPD', 'HKEY_PERFORMANCE_DATA', 'SHCTX',
-  'SHELL_CONTEXT',
+  'HKCU', 'HKEY_CURRENT_USER', 'HKU', 'HKEY_USERS', 'HKCC',
+  'HKEY_CURRENT_CONFIG', 'HKDD', 'HKEY_DYN_DATA', 'HKPD',
+  'HKEY_PERFORMANCE_DATA', 'SHCTX', 'SHELL_CONTEXT',
 
 -- General Purpose Instructions (4.9.3)
   'CallInstDLL', 'CopyFiles',
@@ -155,20 +155,20 @@ local keyword = token('keyword', word_match({
 -- Compile time commands (5)
   '!include', '!addincludedir', '!addplugindir', '!appendfile', '!cd',
   '!delfile', '!echo', '!error', '!execute', '!packhdr', '!system', '!tempfile',
-  '!warning', '!verbose', '{__FILE__}', '{__LINE__}', '{__DATE__}', '{__TIME__}',
-  '{__TIMESTAMP__}', '{NSIS_VERSION}', '!define', '!undef', '!ifdef', '!ifndef',
-  '!if', '!ifmacrodef', '!ifmacrondef', '!else', '!endif', '!insertmacro',
-  '!macro', '!macroend', '!searchparse', '!searchreplace',
+  '!warning', '!verbose', '{__FILE__}', '{__LINE__}', '{__DATE__}',
+  '{__TIME__}', '{__TIMESTAMP__}', '{NSIS_VERSION}', '!define', '!undef',
+  '!ifdef', '!ifndef', '!if', '!ifmacrodef', '!ifmacrondef', '!else', '!endif',
+  '!insertmacro', '!macro', '!macroend', '!searchparse', '!searchreplace',
 }, '/!.{}_'))
 
 -- operators
-local operator = token('operator', S('+-*/%|&^~!<>'))
+local operator = token(l.OPERATOR, S('+-*/%|&^~!<>'))
 
 -- labels
 local label = token('label', l.word * ":")
 
 -- identifiers
-local identifier = token('identifier', l.word)
+local identifier = token(l.IDENTIFIER, l.word)
 
 _rules = {
   { 'whitespace', ws },

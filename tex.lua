@@ -1,4 +1,4 @@
--- Copyright 2006-2010 Mitchell Foral mitchell<att>caladbolg.net. See LICENSE.
+-- Copyright 2006-2010 Mitchell mitchell<att>caladbolg.net. See LICENSE.
 -- April 2010 Robert Gieseke, combined LaTeX and ConTeXt lexing
 -- TeX LPeg lexer
 
@@ -13,13 +13,13 @@ local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
 
 module(...)
 
-local ws = token('whitespace', l.space^1)
+local ws = token(l.WHITESPACE, l.space^1)
 
 -- comments
 local line_comment = '%' * l.nonnewline^0
 local block_comment = '\\begin{comment}' * (l.any - '\\end{comment}')^0 *
-  '\\end{comment}'
-local comment = token('comment', line_comment + block_comment)
+                      '\\end{comment}'
+local comment = token(l.COMMENT, line_comment + block_comment)
 
 -- environment
 -- LaTeX environments
@@ -33,15 +33,15 @@ local env_latex = '\\' * (P('begin') + 'end') * '{' *  word_match({
 local env_latex_math = '\\' * S('[]()') + '$' -- covers '$$' as well
 -- ConTeXt environments
 local env_context = '\\' * (P('start') * l.word + 'stop' * l.word)
-local environment = token('environment',  env_latex + env_latex_math +
-                                          env_context)
+local environment = token('environment', env_latex + env_latex_math +
+                          env_context)
 
 -- commands
 local escapes = S('$%_{}&#')
-local command = token('keyword', '\\' * (l.alpha^1 + escapes))
+local command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
 
 -- operators
-local operator = token('operator', S('$&%#{}[]'))
+local operator = token(l.OPERATOR, S('$&%#{}[]'))
 
 _rules = {
   { 'whitespace', ws },
