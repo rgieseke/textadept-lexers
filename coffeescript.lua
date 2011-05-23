@@ -2,8 +2,8 @@
 -- CoffeeScript LPeg Lexer
 
 local l = lexer
-local token, word_match = l.token, l.word_match
-local S = l.lpeg.S
+local color, token, word_match = l.color, l.token, l.word_match
+local P, S = l.lpeg.P, l.lpeg.S
 
 module(...)
 
@@ -16,7 +16,14 @@ local comment = token(l.COMMENT, line_comment)
 -- strings
 local sq_str = l.delimited_range("'", '\\', true)
 local dq_str = l.delimited_range('"', '\\', true)
-local string = token(l.STRING, sq_str + dq_str)
+local regex_str = l.delimited_range('/', '\\', nil, nil, '\n') * S('igm')^0
+local string = token(l.STRING, sq_str + dq_str) + P(function(input, index)
+  if index == 1 then return index end
+  local i = index
+  while input:sub(i - 1, i - 1):match('[ \t\r\n\f]') do i = i - 1 end
+  return input:sub(i - 1, i - 1):match('[+%-*%%^!=&|?:;,()%[%]{}]') and
+    index or nil
+end) * token('regex', regex_str)
 
 -- numbers
 local number = token(l.NUMBER, l.float + l.integer)
@@ -42,9 +49,13 @@ _rules = {
   { 'whitespace', ws },
   { 'keyword', keyword },
   { 'identifier', identifier },
-  { 'string', string },
   { 'comment', comment },
   { 'number', number },
+  { 'string', string },
   { 'operator', operator },
   { 'any_char', l.any_char },
+}
+
+_tokenstyles = {
+  { 'regex', l.style_string..{ back = color('44', '44', '44')} },
 }
