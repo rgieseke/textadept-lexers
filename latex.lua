@@ -39,3 +39,10 @@ _tokenstyles = {
   { 'parts', l.style_class },
   { 'environment', l.style_tag },
 }
+
+_foldsymbols = {
+  _patterns = { '\\[a-z]+', '[{}]' },
+  [l.COMMENT] = { ['\\begin'] = 1, ['\\end'] = -1 },
+  ['environment'] = { ['\\begin'] = 1, ['\\end'] = -1 },
+  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
+}
