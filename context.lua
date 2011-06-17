@@ -35,11 +35,11 @@ _tokenstyles = {
   { 'environment', l.style_tag },
 }
 
--- Embedded Lua
+-- Embedded Lua.
 local luatex = l.load('lua')
-local lua_start_rule = #P('\\startluacode') * environment
-local lua_end_rule = #P('\\stopluacode') * environment
-l.embed_lexer(_M, luatex, lua_start_rule, lua_end_rule)
+local luatex_start_rule = #P('\\startluacode') * environment
+local luatex_end_rule = #P('\\stopluacode') * environment
+l.embed_lexer(_M, luatex, luatex_start_rule, luatex_end_rule)
 
 _foldsymbols = {
   _patterns = { '\\[a-z]+', '[{}]' },
