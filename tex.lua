@@ -8,20 +8,20 @@ local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
 
 module(...)
 
-ws = token(l.WHITESPACE, l.space^1)
+local ws = token(l.WHITESPACE, l.space^1)
 
 -- Comments.
-comment = token(l.COMMENT, '%' * l.nonnewline^0)
+local comment = token(l.COMMENT, '%' * l.nonnewline^0)
 
 -- TeX environments.
 local environment = token('environment', '\\' * (P('begin') + 'end') * l.word)
 
 -- Commands.
-local escapes = S('$%_{}&#')
-command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
+local escapes = S('#$&~_^%{}')
+local command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
 
 -- Operators.
-operator = token(l.OPERATOR, S('$&#{}[]'))
+local operator = token(l.OPERATOR, S('$&#{}[]'))
 
 _rules = {
   { 'whitespace', ws },
