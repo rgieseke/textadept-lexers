@@ -5,12 +5,14 @@
 local l = lexer
 local token, style, color, word_match = l.token, l.style, l.color, l.word_match
 local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
-
-local tex = require('tex')
+local table = _G.table
 
 module(...)
 
--- parts
+-- Whitespace.
+local ws = token(l.WHITESPACE, l.space^1)
+
+-- Sections.
 local section_keywords = word_match { 'part', 'chapter', 'section',
                                       'subsection', 'subsubsection', 'title',
                                       'subject', 'subsubject',
@@ -20,15 +22,11 @@ local parts = token('parts', '\\' * section_keywords)
 -- ConTeXt environments.
 local environment = token('environment', '\\' * (P('start') + 'stop') * l.word)
 
-_rules = {
-  { 'whitespace', tex.ws },
-  { 'comment', tex.comment },
-  { 'parts', parts },
-  { 'environment', environment },
-  { 'keyword', tex.command },
-  { 'operator', tex.operator },
-  { 'any_char', l.any_char },
-}
+local tex = l.load('tex')
+_rules = tex._rules
+_rules[1] = { 'whitespace', ws }
+_rules[3] = { 'environment', environment }
+table.insert(_rules, 4, { 'parts', parts })
 
 _tokenstyles = {
   { 'parts', l.style_class },
