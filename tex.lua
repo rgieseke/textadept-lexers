@@ -35,3 +35,9 @@ _rules = {
 _tokenstyles = {
   { 'environment', l.style_tag },
 }
+
+_foldsymbols = {
+  _patterns = { '\\begin', '\\end', '[{}]' },
+  ['environment'] = { ['\\begin'] = 1, ['\\end'] = -1 },
+  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
+}

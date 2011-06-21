@@ -12,6 +12,13 @@ module(...)
 -- Whitespace.
 local ws = token(l.WHITESPACE, l.space^1)
 
+-- Comments.
+local comment = token(l.COMMENT, '%' * l.nonnewline^0)
+
+-- Commands.
+local escapes = S('#$&~_^%{}')
+local command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
+
 -- Sections.
 local section_keywords = word_match { 'part', 'chapter', 'section',
                                       'subsection', 'subsubsection', 'title',
@@ -22,15 +29,28 @@ local parts = token('parts', '\\' * section_keywords)
 -- ConTeXt environments.
 local environment = token('environment', '\\' * (P('start') + 'stop') * l.word)
 
-local tex = l.load('tex')
-_rules = tex._rules
-_rules[1] = { 'whitespace', ws }
-_rules[3] = { 'environment', environment }
-table.insert(_rules, 4, { 'parts', parts })
+-- Operators.
+local operator = token(l.OPERATOR, S('$&#{}[]'))
+
+_rules = {
+  { 'whitespace', ws },
+  { 'comment', comment },
+  { 'environment', environment },
+  { 'parts', parts},
+  { 'keyword', command },
+  { 'operator', operator },
+  { 'any_char', l.any_char },
+}
 
 _tokenstyles = {
-  { 'parts', l.style_class },
   { 'environment', l.style_tag },
+  { 'parts', l.style_class },
+}
+
+_foldsymbols = {
+  _patterns = { '\\start', '\\stop', '[{}]' },
+  ['environment'] = { ['\\start'] = 1, ['\\stop'] = -1 },
+  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
 }
 
 -- Embedded Lua.
@@ -39,8 +59,3 @@ local luatex_start_rule = #P('\\startluacode') * environment
 local luatex_end_rule = #P('\\stopluacode') * environment
 l.embed_lexer(_M, luatex, luatex_start_rule, luatex_end_rule)
 
-_foldsymbols = {
-  _patterns = { '\\[a-z]+', '[{}]' },
-  ['environment'] = { ['\\start'] = 1, ['\\stop'] = -1 },
-  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
-}
