@@ -17,8 +17,7 @@ local comment = token(l.COMMENT, '%' * l.nonnewline^0)
 local environment = token('environment', '\\' * (P('begin') + 'end') * l.word)
 
 -- Commands.
-local escapes = S('#$&~_^%{}')
-local command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
+local command = token(l.KEYWORD, '\\' * (l.alpha^1 + S('#$&~_^%{}')))
 
 -- Operators.
 local operator = token(l.OPERATOR, S('$&#{}[]'))

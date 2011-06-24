@@ -16,8 +16,7 @@ local ws = token(l.WHITESPACE, l.space^1)
 local comment = token(l.COMMENT, '%' * l.nonnewline^0)
 
 -- Commands.
-local escapes = S('#$&~_^%{}')
-local command = token(l.KEYWORD, '\\' * (l.alpha^1 + escapes))
+local command = token(l.KEYWORD, '\\' * (l.alpha^1 + S('#$&~_^%{}')))
 
 -- Sections.
 local section_keywords = word_match { 'part', 'chapter', 'section',
