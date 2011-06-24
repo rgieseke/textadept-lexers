@@ -24,18 +24,27 @@ local section_keywords = word_match { 'part', 'chapter', 'section',
                                       'paragraph', 'subparagraph' }
 local parts = token('parts', '\\' * section_keywords * P('*')^-1)
 
+-- Math environments.
+local math_begin_end = ('\\' * (P('begin') + P('end')) * '{' *
+                        word_match({'align', 'displaymath', 'eqnarray',
+                                    'equation', 'gather', 'math', 'multline'}) *
+                        P('*')^-1 * '}')
+local math = token('math', '$' + '\\' * S('[]()') + math_begin_end)
+
 -- LaTeX environments.
-local environment = token('environment', '\\' * (P('begin') + 'end'))
+local environment = token('environment', '\\' * (P('begin') + P('end')) *
+                          '{' * l.word * P('*')^-1 * '}')
 
 -- Commands.
 local command = token(l.KEYWORD, '\\' * (l.alpha^1 + S('#$&~_^%{}')))
 
 -- Operators.
-local operator = token(l.OPERATOR, S('$&#{}[]'))
+local operator = token(l.OPERATOR, S('&#{}[]'))
 
 _rules = {
   { 'whitespace', ws },
   { 'comment', comment },
+  { 'math', math },
   { 'environment', environment },
   { 'parts', parts},
   { 'keyword', command },
@@ -45,6 +54,7 @@ _rules = {
 
 _tokenstyles = {
   { 'environment', l.style_tag },
+  { 'math', l.style_function },
   { 'parts', l.style_class },
 }
 
