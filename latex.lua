@@ -25,11 +25,11 @@ local section_keywords = word_match { 'part', 'chapter', 'section',
 local parts = token('parts', '\\' * section_keywords * P('*')^-1)
 
 -- Math environments.
-local math_begin_end = ('\\' * (P('begin') + P('end')) * '{' *
+local math_begin_end = (P('begin') + P('end')) * '{' *
                         word_match({'align', 'displaymath', 'eqnarray',
                                     'equation', 'gather', 'math', 'multline'}) *
-                        P('*')^-1 * '}')
-local math = token('math', '$' + '\\' * S('[]()') + math_begin_end)
+                        P('*')^-1 * '}'
+local math = token('math', '$' + '\\' * (S('[]()') + math_begin_end))
 
 -- LaTeX environments.
 local environment = token('environment', '\\' * (P('begin') + P('end')) *
