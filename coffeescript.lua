@@ -1,20 +1,21 @@
 -- Copyright 2006-2011 Mitchell mitchell<att>caladbolg.net. See LICENSE.
--- CoffeeScript LPeg Lexer
+-- CoffeeScript LPeg lexer.
 
 local l = lexer
-local color, token, word_match = l.color, l.token, l.word_match
+local token, word_match = l.token, l.word_match
 local P, S = l.lpeg.P, l.lpeg.S
 
 module(...)
 
+-- Whitespace.
 local ws = token(l.WHITESPACE, l.space^1)
 
--- comments
+-- Comments.
 local block_comment = '###' * (l.any - '###')^0 * P('###')^-1
 local line_comment = '#' * l.nonnewline_esc^0
 local comment = token(l.COMMENT, block_comment + line_comment)
 
--- strings
+-- Strings.
 local sq_str = l.delimited_range("'", '\\', true)
 local dq_str = l.delimited_range('"', '\\', true)
 local regex_str = l.delimited_range('/', '\\', nil, nil, '\n') * S('igm')^0
@@ -22,14 +23,13 @@ local string = token(l.STRING, sq_str + dq_str) + P(function(input, index)
   if index == 1 then return index end
   local i = index
   while input:sub(i - 1, i - 1):match('[ \t\r\n\f]') do i = i - 1 end
-  return input:sub(i - 1, i - 1):match('[+%-*%%^!=&|?:;,()%[%]{}]') and
-    index or nil
+  return input:sub(i - 1, i - 1):match('[+%-*%%^!=&|?:;,()%[%]{}]') and index
 end) * token('regex', regex_str)
 
--- numbers
+-- Numbers.
 local number = token(l.NUMBER, l.float + l.integer)
 
--- keywords
+-- Keywords.
 local keyword = token(l.KEYWORD, word_match {
   'all', 'and', 'bind', 'break', 'by', 'case', 'catch', 'class', 'const',
   'continue', 'default', 'delete', 'do', 'each', 'else', 'enum', 'export',
@@ -40,14 +40,14 @@ local keyword = token(l.KEYWORD, word_match {
   'while', 'yes'
 })
 
--- fields: object properties and methods
+-- Fields: object properties and methods.
 local field = token(l.FUNCTION, '.' * (S('_$') + l.alpha) *
                     (S('_$') + l.alnum)^0)
 
--- identifiers
+-- Identifiers.
 local identifier = token(l.IDENTIFIER, l.word)
 
--- operators
+-- Operators.
 local operator = token(l.OPERATOR, S('+-/*%<>!=^&|?~:;.()[]{}'))
 
 _rules = {
@@ -63,5 +63,5 @@ _rules = {
 }
 
 _tokenstyles = {
-  { 'regex', l.style_string..{ back = color('44', '44', '44')} },
+  { 'regex', l.style_string..{ back = l.color('44', '44', '44')} },
 }
