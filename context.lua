@@ -1,13 +1,11 @@
--- Copyright 2006-2011 Mitchell mitchell<att>caladbolg.net. See LICENSE.
--- Modified by Robert Gieseke.
+-- Copyright 2006-2013 Robert Gieseke. See LICENSE.
 -- ConTeXt LPeg lexer.
 
 local l = lexer
 local token, style, color, word_match = l.token, l.style, l.color, l.word_match
-local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
-local table = _G.table
+local P, R, S = lpeg.P, lpeg.R, lpeg.S
 
-module(...)
+local M = {_NAME = 'context'}
 
 -- Whitespace.
 local ws = token(l.WHITESPACE, l.space^1)
@@ -19,11 +17,10 @@ local comment = token(l.COMMENT, '%' * l.nonnewline^0)
 local command = token(l.KEYWORD, '\\' * (l.alpha^1 + S('#$&~_^%{}')))
 
 -- Sections.
-local section_keywords = word_match { 'part', 'chapter', 'section',
-                                      'subsection', 'subsubsection', 'title',
-                                      'subject', 'subsubject',
-                                      'subsubsubject' }
-local parts = token('parts', '\\' * section_keywords)
+local section = token('section', '\\' * word_match{
+  'part', 'chapter', 'section', 'subsection', 'subsubsection', 'title',
+  'subject', 'subsubject', 'subsubsubject'
+})
 
 -- ConTeXt environments.
 local environment = token('environment', '\\' * (P('start') + 'stop') * l.word)
@@ -31,30 +28,33 @@ local environment = token('environment', '\\' * (P('start') + 'stop') * l.word)
 -- Operators.
 local operator = token(l.OPERATOR, S('$&#{}[]'))
 
-_rules = {
-  { 'whitespace', ws },
-  { 'comment', comment },
-  { 'environment', environment },
-  { 'parts', parts},
-  { 'keyword', command },
-  { 'operator', operator },
-  { 'any_char', l.any_char },
+M._rules = {
+  {'whitespace', ws},
+  {'comment', comment},
+  {'environment', environment},
+  {'section', section},
+  {'keyword', command},
+  {'operator', operator},
+  {'any_char', l.any_char},
 }
 
-_tokenstyles = {
-  { 'environment', l.style_tag },
-  { 'parts', l.style_class },
+M._tokenstyles = {
+  {'environment', l.style_tag},
+  {'section', l.style_class},
 }
 
-_foldsymbols = {
-  _patterns = { '\\start', '\\stop', '[{}]' },
-  ['environment'] = { ['\\start'] = 1, ['\\stop'] = -1 },
-  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
+M._foldsymbols = {
+  _patterns = {'\\start', '\\stop', '[{}]', '%%'},
+  ['environment'] = {['\\start'] = 1, ['\\stop'] = -1},
+  [l.OPERATOR] = {['{'] = 1, ['}'] = -1},
+  [l.COMMENT] = {['%'] = l.fold_line_comments('%')}
 }
 
 -- Embedded Lua.
 local luatex = l.load('lua')
 local luatex_start_rule = #P('\\startluacode') * environment
 local luatex_end_rule = #P('\\stopluacode') * environment
-l.embed_lexer(_M, luatex, luatex_start_rule, luatex_end_rule)
+l.embed_lexer(M, luatex, luatex_start_rule, luatex_end_rule)
 
+
+return M

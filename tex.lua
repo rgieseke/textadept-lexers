@@ -1,13 +1,14 @@
--- Copyright 2006-2011 Mitchell mitchell<att>caladbolg.net. See LICENSE.
--- Modified by Robert Gieseke.
+-- Copyright 2006-2013 Mitchell mitchell.att.foicica.com. See LICENSE.
 -- Plain TeX LPeg lexer.
+-- Modified by Robert Gieseke.
 
 local l = lexer
 local token, style, color, word_match = l.token, l.style, l.color, l.word_match
-local P, R, S = l.lpeg.P, l.lpeg.R, l.lpeg.S
+local P, R, S = lpeg.P, lpeg.R, lpeg.S
 
-module(...)
+local M = {_NAME = 'tex'}
 
+-- Whitespace.
 local ws = token(l.WHITESPACE, l.space^1)
 
 -- Comments.
@@ -22,21 +23,24 @@ local command = token(l.KEYWORD, '\\' * (l.alpha^1 + S('#$&~_^%{}')))
 -- Operators.
 local operator = token(l.OPERATOR, S('$&#{}[]'))
 
-_rules = {
-  { 'whitespace', ws },
-  { 'comment', comment },
-  { 'environment', environment },
-  { 'keyword', command },
-  { 'operator', operator },
-  { 'any_char', l.any_char },
+M._rules = {
+  {'whitespace', ws},
+  {'comment', comment},
+  {'environment', environment},
+  {'keyword', command},
+  {'operator', operator},
+  {'any_char', l.any_char},
 }
 
-_tokenstyles = {
-  { 'environment', l.style_tag },
+M._tokenstyles = {
+  {'environment', l.style_tag},
 }
 
-_foldsymbols = {
-  _patterns = { '\\begin', '\\end', '[{}]' },
-  ['environment'] = { ['\\begin'] = 1, ['\\end'] = -1 },
-  [l.OPERATOR] = { ['{'] = 1, ['}'] = -1 }
+M._foldsymbols = {
+  _patterns = {'\\begin', '\\end', '[{}]', '%%'},
+  [l.COMMENT] = {['%'] = l.fold_line_comments('%')},
+  ['environment'] = {['\\begin'] = 1, ['\\end'] = -1},
+  [l.OPERATOR] = {['{'] = 1, ['}'] = -1}
 }
+
+return M
