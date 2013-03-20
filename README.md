@@ -9,8 +9,8 @@ contributed to. Lexers contained in the current release are kept in the
 directory.
 
 #### Links
-Textadept: http://foicica.com/textadept/
-Scintillua: http://foicica.com/scintillua/
+- Textadept: http://foicica.com/textadept/
+- Scintillua: http://foicica.com/scintillua/
 
 ### License
 MIT, same as Textadept/Scintillua.
