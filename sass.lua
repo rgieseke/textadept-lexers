@@ -13,7 +13,7 @@ local line_comment = token(l.COMMENT, '//' * l.nonnewline^0)
 -- Variables.
 local variable = token(l.VARIABLE, '$' * (l.alnum + S('_-'))^1)
 
--- Sass keywords.
+-- Mixins.
 local mixin = token('mixin', P('@') * l.word)
 
 local css = l.load('css')
