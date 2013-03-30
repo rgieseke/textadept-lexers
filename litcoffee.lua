@@ -1,6 +1,5 @@
 -- Literate CoffeeScript LPeg lexer by Robert Gieseke.
---
--- See http://coffeescript.org/#literate
+-- http://coffeescript.org/#literate
 
 local l = lexer
 local token = l.token

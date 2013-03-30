@@ -1,6 +1,5 @@
 -- Less CSS LPeg lexer.
---
--- see http://lesscss.org
+-- http://lesscss.org
 
 local l = lexer
 local token = l.token
