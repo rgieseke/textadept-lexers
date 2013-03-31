@@ -1,4 +1,5 @@
--- Literate CoffeeScript LPeg lexer by Robert Gieseke.
+-- Copyright 2006-2013 Robert Gieseke. See LICENSE.
+-- Literate CoffeeScript LPeg lexer.
 -- http://coffeescript.org/#literate
 
 local l = lexer

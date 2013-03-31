@@ -1,3 +1,4 @@
+-- Copyright 2006-2013 Robert Gieseke. See LICENSE.
 -- Less CSS LPeg lexer.
 -- http://lesscss.org
 

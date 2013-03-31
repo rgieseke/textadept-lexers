@@ -1,3 +1,4 @@
+-- Copyright 2006-2013 Robert Gieseke. See LICENSE.
 -- Sass CSS preprocessor LPeg lexer.
 -- http://sass-lang.com
 
